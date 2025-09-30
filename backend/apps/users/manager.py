@@ -1,29 +1,69 @@
-from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.hashers import make_password
+from django.utils.translation import gettext as _
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, password, **extra_fields):
-        if not username:
-            raise ValueError("Users must have an username")
+    """
+    Custom manager for the User model.
 
-        user = self.model(
-            username=username,
-            password=password,
-            **extra_fields
-        )
+    This manager provides methods to create users and superusers
+    with email and password.
+    """
 
-        user.set_password(password)
+    use_in_migrations = True
+
+    def _create_user(self, username, password, **extra_fields):
+        """
+        Create and save a regular user with the given username and password.
+
+        Args:
+            username (str): The username of the user.
+            password (str): The password for the user.
+            **extra_fields: Additional fields for the user model.
+
+        Returns:
+            User: The created user instance.
+        """
+
+        user = self.model(username=username, **extra_fields)
+        user.password = make_password(password)
         user.save(using=self._db)
-
         return user
 
-    def create_superuser(self, username, password, **extra_fields):
-        user = self.create_user(
-            username,
-            password=password,
-            **extra_fields,
-        )
-        user.is_admin = True
-        user.save(using=self._db)
+    def create_user(self, username, password=None, **extra_fields):
+        """
+        Create and save a regular user with the given username and password.
 
-        return user
+        Args:
+            username (str): The username of the user.
+            password (str): The password for the user.
+            **extra_fields: Additional fields for the user model.
+
+        Returns:
+            User: The created user instance.
+        """
+
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+
+        return self._create_user(username, password, **extra_fields)
+
+    def create_superuser(self, username, password=None, **extra_fields):
+        """
+        Create and save a superuser with the given username and password.
+
+        Args:
+            username (str): The username of the superuser.
+            password (str): The password for the superuser.
+            **extra_fields: Additional fields for the user model.
+
+        Returns:
+            User: The created superuser instance.
+        """
+
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
+
+        return self._create_user(username, password, **extra_fields)

@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import MinLengthValidator
 
 from apps.users.manager import UserManager
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         "Username",
         max_length=160,
@@ -16,7 +17,12 @@ class User(AbstractBaseUser):
         max_length=128,
         validators=[MinLengthValidator(6)],
     )
-
+    name = models.CharField(
+        "Name",
+        max_length=128,
+        blank=True,
+        null=True,
+    )
     is_active = models.BooleanField(
         "Active",
         default=False,
