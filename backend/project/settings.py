@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "project.swagger",
     "apps.musics",
     "apps.users",
+    "apps.genres",
 ]
 
 AUTH_USER_MODEL = "users.User"
