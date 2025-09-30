@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "drf_spectacular_sidecar",
     # Project apps
     "project.swagger",
-    "apps.downloaders",
+    "apps.musics",
     "apps.users",
 ]
 
